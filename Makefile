@@ -1,9 +1,7 @@
 # Define SMALL to disable command line editing and https support
-CFLAGS+=-DSMALL
-
-CFLAGS+=	-Wall -pedantic
-CPPFLAGS+=	-I/usr/local/include -I/opt/local/include
-LDFLAGS+=	-L/usr/local/lib     -L/opt/local/lib
+#CFLAGS=		-Wall -pedantic # -DSMALL
+CPPFLAGS=	-I/usr/local/include -I/opt/local/include
+LDFLAGS=	-L/usr/local/lib     -L/opt/local/lib
 
 BINDIR=		$(PREFIX)/bin
 MANDIR=		$(PREFIX)/man/man1
@@ -15,6 +13,7 @@ SRCS=	cmds.c cmdtab.c complete.c cookie.c domacro.c fetch.c ftp.c \
 OBJS=	cmds.o cmdtab.o complete.o cookie.o domacro.o fetch.o ftp.o \
 	list.o main.o ruserpass.o small.o stringlist.o util.o
 LIBS=	-ledit -lcurses -lutil -ltls -lssl -lcrypto
+LIBS+=	-lresolv # b64_ntop()
 
 all: $(PROG)
 ftp: $(OBJS)
