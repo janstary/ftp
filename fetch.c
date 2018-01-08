@@ -641,18 +641,6 @@ noslash:
 	fin = fdopen(s, "r+");
 #endif /* !NOSSL */
 
-#ifdef SMALL
-	if (lastfile) {
-		if (pipeout) {
-			if (pledge("stdio rpath inet dns tty",  NULL) == -1)
-				err(1, "pledge");
-		} else {
-			if (pledge("stdio rpath wpath cpath inet dns tty", NULL) == -1)
-				err(1, "pledge");
-		}
-	}
-#endif
-
 	if (connect_timeout) {
 		signal(SIGALRM, SIG_DFL);
 		alarmtimer(0);
@@ -939,12 +927,6 @@ noslash:
 		}
 	} else {
 		out = fileno(stdout);
-#ifdef SMALL
-		if (lastfile) {
-			if (pledge("stdio tty", NULL) == -1)
-				err(1, "pledge");
-		}
-#endif
 	}
 
 	/* Trap signals */
