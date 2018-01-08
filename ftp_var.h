@@ -82,6 +82,9 @@
 #define HASHBYTES	1024
 #define FTPBUFLEN	PATH_MAX + 200
 
+#define HOST_NAME_MAX	_POSIX_LOGIN_NAME_MAX
+#define LOGIN_NAME_MAX	_SC_LOGIN_NAME_MAX
+
 #define STALLTIME	5	/* # of seconds of no xfer before "stalling" */
 
 #define	FTP_PORT	21	/* default if ! getservbyname("ftp/tcp") */
