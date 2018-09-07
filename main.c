@@ -79,6 +79,7 @@
 
 #include "cmds.h"
 #include "ftp_var.h"
+#include "strtonum.h"
 
 int connect_timeout;
 

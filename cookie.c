@@ -30,6 +30,7 @@
 #include <time.h>
 
 #include "ftp_var.h"
+#include "strtonum.h"
 
 struct cookie {
 	TAILQ_ENTRY(cookie)	 entry;

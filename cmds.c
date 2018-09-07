@@ -84,6 +84,7 @@
 #include "ftp_var.h"
 #include "pathnames.h"
 #include "cmds.h"
+#include "strtonum.h"
 
 /*
  * Set ascii transfer type.

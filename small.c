@@ -82,6 +82,7 @@
 #include "ftp_var.h"
 #include "pathnames.h"
 #include "small.h"
+#include "strtonum.h"
 
 jmp_buf	jabort;
 char   *mname;

@@ -66,6 +66,7 @@ struct tls;
 
 #include "ftp_var.h"
 #include "cmds.h"
+#include "strtonum.h"
 
 static int	url_get(const char *, const char *, const char *, int);
 void		aborthttp(int);

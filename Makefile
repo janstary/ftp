@@ -9,9 +9,9 @@ MANDIR=		$(PREFIX)/man/man1
 PROG=	ftp
 MAN1=	ftp.1
 SRCS=	cmds.c cmdtab.c complete.c cookie.c domacro.c fetch.c ftp.c \
-	list.c main.c ruserpass.c small.c stringlist.c util.c
+	list.c main.c ruserpass.c small.c stringlist.c util.c strtonum.c
 OBJS=	cmds.o cmdtab.o complete.o cookie.o domacro.o fetch.o ftp.o \
-	list.o main.o ruserpass.o small.o stringlist.o util.o
+	list.o main.o ruserpass.o small.o stringlist.o util.o strtonum.o
 LIBS=	-ledit -lcurses -lutil -ltls -lssl -lcrypto
 LIBS+=	-lresolv # b64_ntop()
 
