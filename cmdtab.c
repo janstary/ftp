@@ -33,6 +33,7 @@
 #ifndef SMALL
 
 #include <stdio.h>
+#include "config.h"
 #include "ftp_var.h"
 #include "cmds.h"
 

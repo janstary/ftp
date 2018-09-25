@@ -1,39 +1,127 @@
-# Define SMALL to disable command line editing and https support
-#CFLAGS=		-Wall -pedantic # -DSMALL
-CPPFLAGS=	-I/usr/local/include -I/opt/local/include
-LDFLAGS=	-L/usr/local/lib     -L/opt/local/lib
+VERSION = 1.0.0
+TARBALL = ftp-$(VERSION).tar.gz
 
-BINDIR=		$(PREFIX)/bin
-MANDIR=		$(PREFIX)/man/man1
+include Makefile.local
 
-PROG=	ftp
-MAN1=	ftp.1
-SRCS=	cmds.c cmdtab.c complete.c cookie.c domacro.c fetch.c ftp.c \
-	list.c main.c ruserpass.c small.c stringlist.c util.c
-OBJS=	cmds.o cmdtab.o complete.o cookie.o domacro.o fetch.o ftp.o \
-	list.o main.o ruserpass.o small.o stringlist.o util.o
-LIBS=	-ledit -lcurses -lutil -ltls -lssl -lcrypto
-LIBS+=	-lresolv # b64_ntop()
+FTP_SRCS =		\
+	cmds.c		\
+	cmds.h		\
+	cmdtab.c	\
+	complete.c	\
+	cookie.c	\
+	domacro.c	\
+	extern.h	\
+	fetch.c		\
+	ftp.c		\
+	ftp_var.h	\
+	list.c		\
+	main.c		\
+	pathnames.h	\
+	ruserpass.c	\
+	small.c		\
+	small.h		\
+	stringlist.c	\
+	stringlist.h	\
+	util.c
 
-all: $(PROG)
+FTP_OBJS =		\
+	cmds.o		\
+	cmdtab.o	\
+	complete.o	\
+	cookie.o	\
+	domacro.o	\
+	fetch.o		\
+	ftp.o		\
+	list.o		\
+	main.o		\
+	ruserpass.o	\
+	small.o		\
+	stringlist.o	\
+	util.o
+
+HAVE_SRCS =			\
+	have-reallocarray.c	\
+	have-strtonum.c
+
+COMPAT_SRCS =			\
+	compat-reallocarray.c	\
+	compat-strtonum.c
+
+COMPAT_OBJS =			\
+	compat-reallocarray.o	\
+	compat-strtonum.o
+
+SRCS = $(FTP_SRCS) $(COMPAT_OBJS) $(HAVE_SRCS)
+OBJS = $(FTP_OBJS) $(COMPAT_OBJS)
+
+BINS = ftp
+MANS = ftp.1
+
+DIST = \
+	LICENSE			\
+	Makefile		\
+	Makefile.depend		\
+	configure		\
+	$(SRCS)			\
+	$(MANS)
+
+all: $(BINS) $(MANS) Makefile.local
+
 ftp: $(OBJS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o ftp $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+#include Makefile.depend
 
 .SUFFIXES: .c .o
+
 .c.o:
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
-lint: $(MAN1)
-	mandoc -Tlint -Wstyle $(MAN1)
+lint: $(MANS)
+	mandoc -Tlint -Wstyle $(MANS)
 
-install: $(PROG) $(MAN1)
-	install -d $(BINDIR) && install -m 555 $(PROG) $(BINDIR)
-	install -d $(MANDIR) && install -m 444 $(MAN1) $(MANDIR)
+install: all
+	install -d $(BINDIR) && install -m 0555 $(BINS) $(BINDIR)
+	install -d $(MANDIR) && install -m 0444 $(MANS) $(MANDIR)
 
 uninstall:
 	cd $(BINDIR) && rm -f $(PROG)
-	cd $(MANDIR) && rm -f $(MAN1)
+	cd $(MANDIR) && rm -f $(MANS)
 
 clean:
-	rm -f $(PROG) $(OBJS) *.core *~
+	rm -f $(BINS) $(OBJS)
+	rm -rf $(TARBALL) ftp-$(VERSION) .dist
+	rm -rf depend _depend .depend
+	rm -rf *.dSYM *.core *~ .*~
 
+distclean: clean
+	rm -f Makefile.local config.*
+
+Makefile.local config.h: configure $(HAVE_SRCS)
+	@echo "$@ is out of date; please run ./configure"
+	@exit 1
+
+depend: config.h
+	mkdep -f depend $(CFLAGS) $(FTP_SRCS)
+	perl -e 'undef $$/; $$_ = <>; s|/usr/include/\S+||g; \
+		s|\\\n||g; s|  +| |g; s| $$||mg; print;' \
+		depend > _depend
+	mv _depend depend
+
+dist: $(TARBALL)
+$(TARBALL): $(DIST)
+	rm -rf .dist
+	mkdir -p .dist/ftp-$(VERSION)/
+	$(INSTALL) -m 0644 $(DIST) .dist/ftp-$(VERSION)/
+	( cd .dist/ftp-$(VERSION) && chmod 755 configure )
+	( cd .dist && tar czf ../$@ ftp-$(VERSION) )
+	rm -rf .dist/
+
+distcheck: dist
+	rm -rf ftp-$(VERSION) && tar xzf $(TARBALL)
+	( cd ftp-$(VERSION) && ./configure && make all )
+
+.PHONY: install uninstall
+.PHONY: clean distclean
+.PHONY: dist distcheck
+.PHONY: lint

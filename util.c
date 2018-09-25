@@ -86,6 +86,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "ftp_var.h"
 #include "pathnames.h"
 

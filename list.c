@@ -19,6 +19,7 @@
 #ifndef SMALL
 
 #include <string.h>
+#include "config.h"
 
 void	parse_list(char **, char *);
 
