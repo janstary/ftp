@@ -79,6 +79,7 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "config.h"
 #include "ftp_var.h"
 #include "pathnames.h"
 #include "small.h"

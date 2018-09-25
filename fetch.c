@@ -64,6 +64,7 @@
 struct tls;
 #endif /* !NOSSL */
 
+#include "config.h"
 #include "ftp_var.h"
 #include "cmds.h"
 

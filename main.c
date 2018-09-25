@@ -77,6 +77,7 @@
 
 #include <tls.h>
 
+#include "config.h"
 #include "cmds.h"
 #include "ftp_var.h"
 

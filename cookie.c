@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "config.h"
 #include "ftp_var.h"
 
 struct cookie {

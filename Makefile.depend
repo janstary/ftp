@@ -1,0 +1,18 @@
+ftp_var.h: extern.h
+
+cmds.o: cmds.c cmds.h pathnames.h ftp_var.h
+cmdtab.o: cmdtab.c ftp_var.h
+complete.o: complete.c ftp_var.h
+cookie.o: cookie.c ftp_var.h
+domacro.o: domacro.c ftp_var.h
+fetch.o: fetch.c ftp_var.h
+ftp.o: ftp.c ftp_var.h
+list.o: list.c
+main.o: main.c ftp_var.h
+ruserpass.o: ruserpass.c ftp_var.h
+small.o: small.c small.h pathnames.h ftp_var.h
+stringlist.o: stringlist.c stringlist.h
+util.o: util.c pathnames.h ftp_var.h
+
+compat-reallocarray.o: compat-reallocarray.c
+compat-strtonum.o: compat-strtonum.c

@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
 #include "ftp_var.h"
 
 void

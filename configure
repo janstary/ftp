@@ -1,0 +1,185 @@
+#!/bin/sh
+
+# Copyright (c) 2014, 2015, 2016, 2017 Ingo Schwarze <schwarze@openbsd.org>
+# Copyright (c) 2018 Jan Stary <hans@stare.cz>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+set -e
+
+[ -w config.log ] && mv config.log config.log.old
+[ -w config.h   ] && mv config.h config.h.old
+
+# Output file descriptors
+# 1: config.h, Makefile.local
+# 2: original stderr
+# 3: config.log
+
+exec 3> config.log
+
+### the defaults ###
+
+PREFIX="/usr/local"
+BINDIR=
+MANDIR=
+
+SRCDIR=`dirname "$0"`
+CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
+CFLAGS="-g -W -Wall -Wstrict-prototypes -Wwrite-strings"
+CFLAGS="${CFLAGS} -Wno-unused-parameter"
+CFLAGS="${CFLAGS} -fPIC"
+LDFLAGS=
+LIBS="-ledit -lcurses -lutil"
+LIBS="${LIBS} -ltls -lssl -lcrypto"
+LIBS="${LIBS} -lresolv" # b64_ntop()
+
+INSTALL="install"
+
+HAVE_REALLOCARRAY=
+HAVE_STRTONUM=
+
+### read in manual settings ###
+
+if [ -r ./configure.local ]; then
+	echo "configure.local: reading..." 1>&2
+	echo "configure.local: reading..." 1>&3
+	cat ./configure.local 1>&3
+	. ./configure.local
+else
+	echo "configure.local: no (fully automatic configuration)" 1>&2
+	echo "configure.local: no (fully automatic configuration)" 1>&3
+fi
+echo 1>&3
+
+### how to run the have-*.c checks ###
+
+COMP="${CC} ${CFLAGS} ${LDFLAGS} -Wno-unused -Werror"
+
+# Check whether this HAVE_ setting is manually overridden.
+# If yes, use the override, if no, do not decide anything yet.
+# Arguments: lower-case name, upper-case name, manual value
+ismanual() {
+	[ -z "${3}" ] && return 1
+	echo "${1}: manual (HAVE_${2}=${3})" 1>&2
+	echo "${1}: manual (HAVE_${2}=${3})" 1>&3
+	echo 1>&3
+	return 0
+}
+
+# Run a single autoconfiguration test.
+# In case of success, enable the feature.
+# In case of failure, do not decide anything yet.
+# Arguments: lower-case name, upper-case name, additional flags
+singletest() {
+	cat 1>&3 << __HEREDOC__
+${1}${3}: testing...
+${COMP} -o have-${1} have-${1}.c ${3}
+__HEREDOC__
+
+	if ${COMP} -o "have-${1}" "${SRCDIR}/have-${1}.c" ${3} 1>&3 2>&3
+	then
+		echo "${1}${3}: ${CC} succeeded" 1>&3
+	else
+		echo "${1}${3}: ${CC} failed with $?" 1>&3
+		echo 1>&3
+		return 1
+	fi
+
+	if ./have-${1} 1>&3 2>&3; then
+		echo "${1}${3}: yes" 1>&2
+		echo "${1}${3}: yes" 1>&3
+		echo 1>&3
+		eval HAVE_${2}=1
+		rm "have-${1}"
+		return 0
+	else
+		echo "${1}${3}: execution failed with $?" 1>&3
+		echo 1>&3
+		rm "have-${1}"
+		return 1
+	fi
+}
+
+# Run a complete autoconfiguration test, including the check
+# for a manual override and disabling the feature on failure.
+# Arguments: lower case name, upper case name, additional flags
+runtest() {
+	eval _manual=\${HAVE_${2}}
+	ismanual "${1}" "${2}" "${_manual}" && return 0
+	singletest "${1}" "${2}" "${3}" && return 0
+	echo "${1}${3}: no" 1>&2
+	eval HAVE_${2}=0
+	return 1
+}
+
+### run the tests ###
+
+runtest reallocarray	REALLOCARRAY		|| true
+runtest strtonum	STRTONUM		|| true
+
+### write config.h ###
+
+exec > config.h
+
+[ ${HAVE_REALLOCARRAY} -eq 0 ] && echo "#include <sys/types.h>"
+
+cat << __HEREDOC__
+
+#define HAVE_REALLOCARRAY	${HAVE_REALLOCARRAY}
+#define HAVE_STRTONUM		${HAVE_STRTONUM}
+
+#ifndef timespecsub
+#define timespecsub(tsp, usp, vsp) {					\\
+		(vsp)->tv_sec  = (tsp)->tv_sec  - (usp)->tv_sec;	\\
+		(vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec;	\\
+		if ((vsp)->tv_nsec < 0) {				\\
+			(vsp)->tv_sec--;				\\
+			(vsp)->tv_nsec += 1000000000L;			\\
+		}							\\
+	}
+#endif
+
+__HEREDOC__
+
+[ ${HAVE_STRTONUM} -eq 0 ] && echo \
+"extern long long strtonum(const char*, long long, long long, const char**);"
+[ ${HAVE_REALLOCARRAY} -eq 0 ] && echo \
+"void* reallocarray(void *optr, size_t nmemb, size_t size);"
+
+echo "config.h: written" 1>&2
+echo "config.h: written" 1>&3
+
+### write Makefile.local ###
+
+exec > Makefile.local
+
+[ -z "${BINDIR}"          ] && BINDIR="${PREFIX}/bin"
+[ -z "${MANDIR}"          ] && MANDIR="${PREFIX}/man/man1"
+
+cat << __HEREDOC__
+CC		= ${CC}
+CFLAGS		= ${CFLAGS}
+LDFLAGS		= ${LDFLAGS}
+LIBS		= ${LIBS}
+
+INSTALL		= ${INSTALL}
+PREFIX		= ${PREFIX}
+BINDIR		= ${BINDIR}
+MANDIR		= ${MANDIR}
+
+__HEREDOC__
+
+echo "Makefile.local: written" 1>&2
+echo "Makefile.local: written" 1>&3
+
+exit 0

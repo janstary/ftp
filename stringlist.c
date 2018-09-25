@@ -34,6 +34,7 @@
 #include <err.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include "stringlist.h"
 
 #define _SL_CHUNKSIZE	20

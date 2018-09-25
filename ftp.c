@@ -81,6 +81,7 @@
 #include <unistd.h>
 #include <utime.h>
 
+#include "config.h"
 #include "ftp_var.h"
 
 union sockaddr_union {

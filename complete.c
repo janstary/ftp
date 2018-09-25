@@ -43,6 +43,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
 #include "ftp_var.h"
 
 static int	     comparstr(const void *, const void *);
