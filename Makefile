@@ -51,7 +51,7 @@ COMPAT_OBJS =			\
 	compat-reallocarray.o	\
 	compat-strtonum.o
 
-SRCS = $(FTP_SRCS) $(COMPAT_OBJS) $(HAVE_SRCS)
+SRCS = $(FTP_SRCS) $(COMPAT_SRCS) $(HAVE_SRCS)
 OBJS = $(FTP_OBJS) $(COMPAT_OBJS)
 
 BINS = ftp
