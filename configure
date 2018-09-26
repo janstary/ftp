@@ -132,6 +132,7 @@ runtest strtonum	STRTONUM		|| true
 exec > config.h
 
 [ ${HAVE_REALLOCARRAY} -eq 0 ] && echo "#include <sys/types.h>"
+[ ${HAVE_STRTONUM}     -eq 0 ] && echo "#include <sys/types.h>"
 
 cat << __HEREDOC__
 
