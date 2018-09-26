@@ -1,6 +1,6 @@
 # ftp
 
-This is a standalone version of [http://www.openbsd.org](OpenBSD)'s `ftp(1)`
+This is a standalone version of [OpenBSD](http://www.openbsd.org)'s `ftp(1)`
 to be used on other systems which don't have it, such as MacOS since 10.13,
 or whose version is seriously outdated.
 
@@ -15,7 +15,7 @@ $ sudo make install
 ```
 
 Long story: this version of ftp aims to be very portable.
-It uses a build system borrowed from [http://mandoc.bsd.lv/](mandoc),
+It uses a build system borrowed from [mandoc](http://mandoc.bsd.lv/),
 consisting of a simple Makefile and a hand-written `./configure` script,
 accompanied by a set of trivial `have-*.c` programs
 autodetecting the presence (or lack) of certain features,
@@ -36,8 +36,8 @@ copy `configure.example` to `configure.local`,
 override the autodetection, and run `./configure` again.
 
 For example, you might need to edit `CFLAGS` and `LDFLAGS` to point to
-thr required libraries and their headers. In particular, you will need
-a recent enough `libtls` from [http://mandoc.bsd.lv/](LibreSSL).
+the required libraries and their headers. In particular, you will need
+a recent enough `libtls` from [LibreSSL](https://www.libressl.org/).
 See `configure.example` for the details.
 
 Read `config.h` and check that the `#define HAVE_*` lines
@@ -50,20 +50,18 @@ Failures are most likely to happen
 if headers or libraries are installed in unusual places
 or interfaces defined in unusual headers.
 
-Please tell `hans@stare.cz` if any of the autodetection fails
+Please submit an issue here if any of the autodetection fails
 or any of the compatibility functions dont't work.
 
 ### build and install
 
 Run `make` to build `ftp`.
-Run `make install` (or possibly `sudo make install`)
+Run `make install` (or `sudo make install`)
 to install the `ftp` binary and the `ftp.1` manpage.
 
 ## systems
 
-These are the systems where this is tested.
-If any of the autodetection fails for you
-or any of the compatibility functions does not work,
-please let me know.
+These are the systems where I test this.
+Please let me know if it doesn't work for you.
 
 * MacOS 10.13.6
