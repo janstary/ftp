@@ -1,4 +1,4 @@
-VERSION = 1.0.0
+VERSION = 1.0.1
 TARBALL = ftp-$(VERSION).tar.gz
 
 include Makefile.local
