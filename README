@@ -1,2 +1,0 @@
-This is a standalone version of OpenBSD's ftp(1) to be used on other systems.
-The motvation is that in MacOS 10.13.2, Apple has dropped the base ftp(1).
