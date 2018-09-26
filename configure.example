@@ -29,7 +29,7 @@ MANDIR="${PREFIX}/man/man1"
 # On some systems (MacOS), we also need -lresolv for b64_ntop().
 
 CFLAGS="${CFLAGS} -I/usr/local/include"
-LDFLAGS="${CFLAGS} -I/usr/local/lib"
+LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
 # It is possible to change the utility program used for installation.
 # FIXME test on Solaris, which has a strange install(1).
