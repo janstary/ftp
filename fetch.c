@@ -215,6 +215,11 @@ url_get(const char *origline, const char *proxyenv, const char *outfile, int las
 	direction = "received";
 
 	newline = strdup(origline);
+
+    /* Ignore any trailing `fragment' from the HTTP URL.
+     * Fragments (HTML anchors) are identified by a hash char ('#'),
+     * as per RFC 3986. */
+    newline = strsep(&newline, "#");
 	if (newline == NULL)
 		errx(1, "Can't allocate memory to parse URL");
 	if (strncasecmp(newline, HTTP_URL, sizeof(HTTP_URL) - 1) == 0) {
