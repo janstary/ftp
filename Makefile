@@ -81,12 +81,14 @@ lint: $(MANS)
 	mandoc -Tlint -Wstyle $(MANS)
 
 install: all
-	install -d $(BINDIR) && install -m 0555 $(BINS) $(BINDIR)
-	install -d $(MANDIR) && install -m 0444 $(MANS) $(MANDIR)
+	install -d $(DESTDIR)/$(BINDIR)
+	install -d $(DESTDIR)/$(MANDIR)
+	install -m 0555 $(BINS) $(DESTDIR)/$(BINDIR)
+	install -m 0444 $(MANS) $(DESTDIR)/$(MANDIR)
 
 uninstall:
-	cd $(BINDIR) && rm -f $(PROG)
-	cd $(MANDIR) && rm -f $(MANS)
+	cd $(DESTDIR)/$(BINDIR) && rm -f $(BINS)
+	cd $(DESTDIR)/$(MANDIR) && rm -f $(MANS)
 
 clean:
 	rm -f $(BINS) $(OBJS)
